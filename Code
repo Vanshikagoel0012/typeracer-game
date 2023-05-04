@@ -1,0 +1,84 @@
+import pygame
+import random
+
+# Initialize pygame
+pygame.init()
+
+# Define game constants
+WIDTH = 800
+HEIGHT = 600
+FPS = 60
+
+# Define colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# Create the game window
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Typing Game")
+
+# Load the font
+font = pygame.font.Font(None, 48)
+
+# Define the game loop
+def game_loop():
+    # Set up the game variables
+    score = 0
+    time_left = 30
+    text_input = ""
+    word_list = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape", "honeydew", "kiwi", "lemon"]
+
+    # Set up the game clock
+    clock = pygame.time.Clock()
+
+    # Start the game loop
+    running = True
+    while running:
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    text_input = text_input[:-1]
+                elif event.key == pygame.K_RETURN:
+                    if text_input == word_list[0]:
+                        word_list.pop(0)
+                        text_input = ""
+                        score += 1
+                    else:
+                        text_input = ""
+
+        # Generate a new word if the list is empty
+        if len(word_list) == 0:
+            word_list.append(random.choice(["apple", "banana", "cherry", "date", "elderberry", "fig", "grape", "honeydew", "kiwi", "lemon"]))
+
+        # Update the time
+        time_left -= clock.tick(FPS) / 1000
+        if time_left <= 0:
+            running = False
+
+        # Draw the game screen
+        screen.fill(WHITE)
+        text_surface = font.render("Score: {} Time: {:.2f}".format(score, time_left), True, BLACK)
+        screen.blit(text_surface, (10, 10))
+        word_surface = font.render(word_list[0], True, BLACK)
+        screen.blit(word_surface, (10, 100))
+        input_surface = font.render(text_input, True, BLACK)
+        screen.blit(input_surface, (10, 200))
+        pygame.display.flip()
+
+    # Game over screen
+    screen.fill(WHITE)
+    text_surface = font.render("Game Over! Score: {}".format(score), True, BLACK)
+    screen.blit(text_surface, (WIDTH//2 - text_surface.get_width()//2, HEIGHT//2 - text_surface.get_height()//2))
+    pygame.display.flip()
+
+    # Wait for a few seconds before quitting
+    pygame.time.wait(3000)
+
+# Run the game loop
+game_loop()
+
+# Quit pygame
+pygame.quit()
